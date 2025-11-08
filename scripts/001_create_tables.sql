@@ -1,0 +1,127 @@
+-- Agency Tables
+CREATE TABLE IF NOT EXISTS fai_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    month VARCHAR(50) UNIQUE NOT NULL,
+    score FLOAT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS worker_stats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    jobs_done INTEGER DEFAULT 0,
+    reputation FLOAT DEFAULT 50.0,
+    "group" VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type VARCHAR(50) NOT NULL,
+    amount FLOAT NOT NULL,
+    source_or_destination VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255),
+    content TEXT,
+    submitted_by VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS impact_map_layers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    layer_type VARCHAR(50),
+    data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Community Tables
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role VARCHAR(50),
+    reputation_score FLOAT DEFAULT 0.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS wallets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    balance FLOAT DEFAULT 0.0,
+    credits FLOAT DEFAULT 0.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title VARCHAR(255),
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'active',
+    reward FLOAT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS skills_courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255),
+    description TEXT,
+    duration_hours FLOAT,
+    certification_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS climate_voice_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title VARCHAR(255),
+    description TEXT,
+    location VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'submitted',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS reputations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    score FLOAT DEFAULT 0.0,
+    badges VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS campaigns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255),
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'upcoming',
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS water_levels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    zone VARCHAR(100) UNIQUE NOT NULL,
+    level_percentage FLOAT,
+    status VARCHAR(50),
+    alert VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS energy_credits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    credits FLOAT DEFAULT 0.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
