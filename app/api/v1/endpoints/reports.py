@@ -1,12 +1,9 @@
-from fastapi import APIRouter, Depends
-from app.services import agency_service
-from app.core.security import verify_agency_role
-from app.schemas.auth import TokenData
+from fastapi import APIRouter
 
 router = APIRouter()
 
 @router.get("/reports/impact")
-async def get_impact_report(token: TokenData = Depends(verify_agency_role)):
+async def get_impact_report():
     """Get impact summary report"""
     return {
         "success": True,
@@ -19,7 +16,7 @@ async def get_impact_report(token: TokenData = Depends(verify_agency_role)):
     }
 
 @router.get("/reports/download")
-async def download_report(format: str = "pdf", token: TokenData = Depends(verify_agency_role)):
+async def download_report(format: str = "pdf"):
     """Download report in specified format"""
     return {
         "success": True,

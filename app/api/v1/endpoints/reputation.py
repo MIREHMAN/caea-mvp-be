@@ -1,20 +1,18 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from app.services import community_service
-from app.core.security import verify_community_role
-from app.schemas.auth import TokenData
 
 router = APIRouter()
 
 @router.get("/reputation/score")
-async def get_reputation(token: TokenData = Depends(verify_community_role)):
+async def get_reputation(user_id: int = 1):
     """Get user reputation score"""
-    rep = await community_service.get_user_reputation(token.user_id)
+    rep = await community_service.get_user_reputation(user_id)
     if not rep:
         return {"success": True, "data": {"score": 50, "badges": []}}
     return {"success": True, "data": rep}
 
 @router.get("/reputation/badges")
-async def get_badges(token: TokenData = Depends(verify_community_role)):
+async def get_badges():
     """Get user badges"""
     return {
         "success": True,

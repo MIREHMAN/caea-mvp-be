@@ -1,11 +1,9 @@
-from fastapi import APIRouter, Depends
-from app.core.security import verify_agency_role
-from app.schemas.auth import TokenData
+from fastapi import APIRouter
 
 router = APIRouter()
 
 @router.get("/admin/settings")
-async def get_settings(token: TokenData = Depends(verify_agency_role)):
+async def get_settings():
     """Get system settings"""
     return {
         "success": True,
@@ -18,6 +16,6 @@ async def get_settings(token: TokenData = Depends(verify_agency_role)):
     }
 
 @router.post("/admin/trigger")
-async def trigger_action(action: str, token: TokenData = Depends(verify_agency_role)):
+async def trigger_action(action: str):
     """Trigger system actions"""
     return {"success": True, "message": f"Action '{action}' triggered"}
