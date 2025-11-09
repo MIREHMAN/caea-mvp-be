@@ -6,7 +6,7 @@ import logging
 from app.core.config import settings
 from app.api.v1.endpoints import (
     auth, insights, planner, funds, feed, impact_map, workforce, admin, reports,
-    jobs, wallet, greenskills, climatevoice, reputation, campaigns, water_impact, energyshare
+    jobs, wallet, greenskills, climatevoice, reputation, campaigns, water_impact, energyshare, community_impact
 )
 from app.db.session import engine, Base
 from app.db.seed_data import seed_database
@@ -35,7 +35,7 @@ app = FastAPI(
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001","http://localhost:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -63,6 +63,7 @@ app.include_router(reputation.router, prefix="/api/v1/community", tags=["Communi
 app.include_router(campaigns.router, prefix="/api/v1/community", tags=["Community - Campaigns"])
 app.include_router(water_impact.router, prefix="/api/v1/community", tags=["Community - Water"])
 app.include_router(energyshare.router, prefix="/api/v1/community", tags=["Community - Energy"])
+app.include_router(community_impact.community_impact_router, prefix="/api/v1/community", tags=["Community - Impact Map"])
 
 @app.get("/")
 async def root():

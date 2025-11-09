@@ -7,19 +7,25 @@ from app.models.community import User, Wallet, Job, SkillsCourse, Campaign, Wate
 def seed_database():
     db = SessionLocal()
     try:
-        # Clear existing data
+        # Clear existing data in correct order to avoid foreign key issues
         db.query(FAIMetric).delete()
         db.query(WorkerStats).delete()
         db.query(Transaction).delete()
         db.query(Report).delete()
         db.query(ImpactMapLayer).delete()
-        db.query(User).delete()
+        
+        # Dependent tables first
+        db.query(Wallet).delete()
+        db.query(EnergyCredit).delete()
         db.query(Job).delete()
+        db.query(User).delete()
+        
         db.query(SkillsCourse).delete()
         db.query(Campaign).delete()
         db.query(WaterLevel).delete()
-        db.query(EnergyCredit).delete()
         
+        db.commit()  # Commit deletions
+
         # Seed FAI Metrics
         fai_data = [
             FAIMetric(month="Jan", score=72),
@@ -71,22 +77,24 @@ def seed_database():
             User(name="Ali", email="ali@example.com", role="community", reputation_score=75),
         ]
         db.add_all(users_data)
-        db.commit()
-        
-        # Seed Wallets
+        db.commit()  # Commit users first to get IDs
+
+        # Fetch users for dependent seeding
         users = db.query(User).all()
+
+        # Seed Wallets
         for user in users:
             wallet = Wallet(user_id=user.id, balance=1000.0, credits=500.0)
             db.add(wallet)
-        
+
         # Seed Jobs
         jobs_data = [
-            Job(user_id=1, title="Clean Community Park", description="Clean and maintain the community park", status="active", reward=50),
-            Job(user_id=1, title="Plant Trees", description="Plant trees in degraded area", status="completed", reward=75),
-            Job(user_id=3, title="Water Conservation", description="Repair water leakage", status="active", reward=100),
+            Job(user_id=users[0].id, title="Clean Community Park", description="Clean and maintain the community park", status="active", reward=50),
+            Job(user_id=users[0].id, title="Plant Trees", description="Plant trees in degraded area", status="completed", reward=75),
+            Job(user_id=users[2].id, title="Water Conservation", description="Repair water leakage", status="active", reward=100),
         ]
         db.add_all(jobs_data)
-        
+
         # Seed Green Skills Courses
         courses_data = [
             SkillsCourse(title="Solar Basics", description="Learn solar energy fundamentals", duration_hours=10),
@@ -94,14 +102,14 @@ def seed_database():
             SkillsCourse(title="Green Entrepreneurship", description="Start a green business", duration_hours=15),
         ]
         db.add_all(courses_data)
-        
+
         # Seed Campaigns
         campaigns_data = [
             Campaign(title="Water Tank Installation", description="Install 100 water tanks", status="active", start_date="2024-01-01", end_date="2024-03-01"),
             Campaign(title="Tree Planting Drive", description="Plant 5000 trees", status="upcoming", start_date="2024-02-01", end_date="2024-04-01"),
         ]
         db.add_all(campaigns_data)
-        
+
         # Seed Water Levels
         water_data = [
             WaterLevel(zone="Zone A", level_percentage=35, status="low", alert="Water level below 40%"),
@@ -109,12 +117,12 @@ def seed_database():
             WaterLevel(zone="Zone C", level_percentage=15, status="critical", alert="Critical: Water level below 20%"),
         ]
         db.add_all(water_data)
-        
+
         # Seed Energy Credits
         for user in users:
             energy = EnergyCredit(user_id=user.id, credits=100.0)
             db.add(energy)
-        
+
         db.commit()
         print("[v0] Database seeded successfully with mock data")
     except Exception as e:
